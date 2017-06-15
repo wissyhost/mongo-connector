@@ -555,7 +555,7 @@ class OplogThread(threading.Thread):
                 # explicit.
                 db_list = retry_until_ok(self.primary_client.database_names)
             for database in db_list:
-                if database == "config.json" or database == "local":
+                if database == "config" or database == "local":
                     continue
                 coll_list = retry_until_ok(
                     self.primary_client[database].collection_names)
