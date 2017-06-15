@@ -1,3 +1,4 @@
+# coding=utf-8
 # Copyright 2013-2014 MongoDB, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +45,9 @@ def exception_wrapper(mapping):
                 if new_type is None:
                     raise
                 reraise(new_type, exc_value, exc_tb)
+
         return wrapped
+
     return decorator
 
 
@@ -81,9 +84,9 @@ def retry_until_ok(func, *args, **kwargs):
             # Do not mask RuntimeError.
             raise
         except errors.OperationFailure as exc:
-            if exc.code == 13 or (   # MongoDB >= 2.6 sets the error code,
-                    exc.details and  # MongoDB 2.4 does not.
-                    'unauthorized' == exc.details.get('errmsg')):
+            if exc.code == 13 or (  # MongoDB >= 2.6 sets the error code,
+                        exc.details and  # MongoDB 2.4 does not.
+                            'unauthorized' == exc.details.get('errmsg')):
                 # Do not mask authorization failures.
                 raise
             if i == max_tries - 1:
@@ -91,6 +94,7 @@ def retry_until_ok(func, *args, **kwargs):
                               'retry_until_ok', func)
                 raise
         except Exception:
+            LOG.error("异常："+e.message)
             if i == max_tries - 1:
                 LOG.exception('Call to %s failed too many times in '
                               'retry_until_ok', func)
@@ -102,7 +106,10 @@ def log_fatal_exceptions(func):
     def wrapped(*args, **kwargs):
         try:
             func(*args, **kwargs)
-        except Exception:
+        except Exception as e:
             LOG.exception("Fatal Exception")
+            LOG.exception(e.message)
+            print e.message
             raise
+
     return wrapped

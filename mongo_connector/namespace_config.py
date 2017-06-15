@@ -226,6 +226,12 @@ class NamespaceConfig(object):
         if namespace:
             return namespace.dest_name
         return None
+    def get_tables(self):
+        tables = []
+        for i in self._reverse_plain.keys():
+            if not i.startswith("__") and not i.endswith("$cmd") :
+                tables.append(i)
+        return tables
 
     def gridfs_namespace(self, plain_src_ns):
         """Given a plain source namespace, return the corresponding plain
